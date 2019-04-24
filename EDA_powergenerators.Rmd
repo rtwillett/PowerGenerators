@@ -1,0 +1,61 @@
+---
+title: "Analysis of Power Generators in the US"
+output: html_notebook
+author: "Ryan Willett"
+---
+
+Loading libraries
+```{r}
+library(shiny)
+library(shinydashboard)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(leaflet)
+
+# Initialization of plot theme
+t <- theme_classic()
+```
+
+Loading data
+```{r}
+data <- read.csv("./data/january_generator2019.csv", stringsAsFactors = F, header = T)
+data <- data %>% rename(
+  capacity_MW = Nameplate.Capacity..MW.,
+  capacity_MW_summer = Net.Summer.Capacity..MW.,
+  capacity_MW_winter = Net.Winter.Capacity..MW.) %>% 
+  select(-Google.Map,-Bing.Map)
+
+colsToNum <- c("capacity_MW", "capacity_MW_summer", "capacity_MW_winter")
+data[colsToNum] <- sapply(data[colsToNum], as.numeric)
+```
+
+## Tab 1
+
+Map enabling filtering of various features including: 
+* Location of all generators
+```{r}
+num_per_state <- data %>% group_by(Plant.State) %>% tally()
+
+ggplot(num_per_state, aes(x = reorder(Plant.State, desc(Plant.State)), y = n)) + t +
+  geom_col() + coord_flip() +
+  labs(x = "State", y = "Number of Power Generators")
+```
+
+* Showing generators of particular type
+
+```{r}
+
+# Breakdown of the number of generators total by technology
+data %>% group_by(Technology) %>% tally() %>% arrange(desc(n))
+
+data %>% group_by(Technology) %>% summarise(sum_MW = sum(capacity_MW))
+```
+
+* Aggregated summary of total number of generators in each state
+
+Bar graph displaying the breakdown of:
+* Number of each generator type in the state
+* Number of power generator by company
+
+## Tab 2
