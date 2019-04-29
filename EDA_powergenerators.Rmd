@@ -5,7 +5,7 @@ author: "Ryan Willett"
 ---
 
 Loading libraries
-```{r}
+```{r, echo=F}
 library(shiny)
 library(shinydashboard)
 library(tidyverse)
@@ -24,7 +24,10 @@ data <- data %>% rename(
   capacity_MW = Nameplate.Capacity..MW.,
   capacity_MW_summer = Net.Summer.Capacity..MW.,
   capacity_MW_winter = Net.Winter.Capacity..MW.) %>% 
-  select(-Google.Map,-Bing.Map)
+  select(-Google.Map,-Bing.Map) %>% 
+  mutate(capacity_MW = gsub(",","", capacity_MW), 
+         capacity_MW_summer = gsub(",","", capacity_MW_summer),
+         capacity_MW_winter = gsub(",","", capacity_MW_winter))
 
 colsToNum <- c("capacity_MW", "capacity_MW_summer", "capacity_MW_winter")
 data[colsToNum] <- sapply(data[colsToNum], as.numeric)
@@ -34,13 +37,96 @@ data[colsToNum] <- sapply(data[colsToNum], as.numeric)
 
 Map enabling filtering of various features including: 
 * Location of all generators
-```{r}
-num_per_state <- data %>% group_by(Plant.State) %>% tally()
 
-ggplot(num_per_state, aes(x = reorder(Plant.State, desc(Plant.State)), y = n)) + t +
-  geom_col() + coord_flip() +
-  labs(x = "State", y = "Number of Power Generators")
+```{r}
+
+#Testing first with all nuclear
+data_nuc <- data %>% filter(Technology == "Natural Gas Steam Turbine")
+
+plant_map <- leaflet(data = data_nuc) %>% addTiles() %>%
+  addMarkers(clusterOptions = markerClusterOptions() ,
+             lng = ~Longitude,
+             lat = ~Latitude,
+             popup = ~Plant.Name)
+plant_map
+
 ```
+
+```{r}
+AllStates <- map("state", fill = TRUE,
+                 plot = FALSE,
+                 region = c(
+                   "Alabama",
+                   "Alaska",
+                   "American Samoa",
+                   "Arizona",
+                   "Arkansas",
+                   "California",
+                   "Colorado",
+                   "Connecticut",
+                   "Delaware",
+                   "District of Columbia",
+                   "Florida",
+                   "Georgia",
+                   "Guam",
+                   "Hawaii",
+                   "Idaho",
+                   "Illinois",
+                   "Indiana",
+                   "Iowa",
+                   "Kansas",
+                   "Kentucky",
+                   "Louisiana",
+                   "Maine",
+                   "Maryland",
+                   "Massachusetts",
+                   "Michigan",
+                   "Minnesota",
+                   "Minor Outlying Islands",
+                   "Mississippi",
+                   "Missouri",
+                   "Montana",
+                   "Nebraska",
+                   "Nevada",
+                   "New Hampshire",
+                   "New Jersey",
+                   "New Mexico",
+                   "New York",
+                   "North Carolina",
+                   "North Dakota",
+                   "Northern Mariana Islands",
+                   "Ohio",
+                   "Oklahoma",
+                   "Oregon",
+                   "Pennsylvania",
+                   "Puerto Rico",
+                   "Rhode Island",
+                   "South Carolina",
+                   "South Dakota",
+                   "Tennessee",
+                   "Texas",
+                   "U.S. Virgin Islands",
+                   "Utah",
+                   "Vermont",
+                   "Virginia",
+                   "Washington",
+                   "West Virginia",
+                   "Wisconsin",
+                   "Wyoming"
+                 ))
+```
+
+```{r}
+data %>% group_by(Plant.State) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(Plant.State)
+
+leaflet() %>% addTiles() %>% addPolygons(data = AllStates,
+                                         #fillColor = heat.colors(8, alpha = 1),
+                                         color = "black",
+                                         stroke = FALSE)
+```
+
+
+* What is the largest 
 
 * Showing generators of particular type
 
@@ -49,13 +135,33 @@ ggplot(num_per_state, aes(x = reorder(Plant.State, desc(Plant.State)), y = n)) +
 # Breakdown of the number of generators total by technology
 data %>% group_by(Technology) %>% tally() %>% arrange(desc(n))
 
-data %>% group_by(Technology) %>% summarise(sum_MW = sum(capacity_MW))
+data %>% group_by(Technology) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(desc(sum_MW))
 ```
 
 * Aggregated summary of total number of generators in each state
+```{r}
+num_per_state <- data %>% group_by(Plant.State) %>% tally()
+
+ggplot(num_per_state, aes(x = reorder(Plant.State, desc(Plant.State)), y = n)) + t +
+  geom_col() + coord_flip() +
+  labs(x = "State", y = "Number of Power Generators")
+```
 
 Bar graph displaying the breakdown of:
 * Number of each generator type in the state
+* Amount of power produced  by each power technology in the state 
+* The company with the most number of generators
+* The companies ranked in the state by power production
+```{r}
+data %>% filter(Plant.State == "CA") %>% group_by(Technology) %>% tally() %>% arrange(desc(n))
+
+data %>% filter(Plant.State == "CA") %>% group_by(Technology) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(desc(sum_MW))
+
+data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% tally() %>% arrange(desc(n))
+
+data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(desc(sum_MW))
+```
+
 * Number of power generator by company
 
 ## Tab 2
