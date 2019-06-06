@@ -2,8 +2,9 @@ library(shiny)
 library(shinydashboard)
 library(tidyverse)
 library(ggplot2)
-library(plotly)
 library(leaflet)
+library(DT)
+library(googleVis)
 
 data <- read.csv("./data/january_generator2019.csv", stringsAsFactors = F, header = T)
 data <- data %>% rename(
@@ -21,5 +22,5 @@ data[colsToNum] <- sapply(data[colsToNum], as.numeric)
 t <- theme_classic()
 
 # Global Variables
-choices_state <- c(unique(data$Plant.State))
-choices_tech <- c(unique(data$Technology))
+choices_state <- sort(c(unique(data$Plant.State)))
+choices_tech <- sort(c(unique(data$Technology)))

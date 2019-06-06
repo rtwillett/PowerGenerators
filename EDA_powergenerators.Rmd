@@ -12,6 +12,7 @@ library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(leaflet)
+library(googleVis)
 
 # Initialization of plot theme
 t <- theme_classic()
@@ -68,7 +69,6 @@ AllStates <- map("state", fill = TRUE,
                    "District of Columbia",
                    "Florida",
                    "Georgia",
-                   "Guam",
                    "Hawaii",
                    "Idaho",
                    "Illinois",
@@ -82,7 +82,6 @@ AllStates <- map("state", fill = TRUE,
                    "Massachusetts",
                    "Michigan",
                    "Minnesota",
-                   "Minor Outlying Islands",
                    "Mississippi",
                    "Missouri",
                    "Montana",
@@ -94,18 +93,15 @@ AllStates <- map("state", fill = TRUE,
                    "New York",
                    "North Carolina",
                    "North Dakota",
-                   "Northern Mariana Islands",
                    "Ohio",
                    "Oklahoma",
                    "Oregon",
                    "Pennsylvania",
-                   "Puerto Rico",
                    "Rhode Island",
                    "South Carolina",
                    "South Dakota",
                    "Tennessee",
                    "Texas",
-                   "U.S. Virgin Islands",
                    "Utah",
                    "Vermont",
                    "Virginia",
@@ -117,16 +113,36 @@ AllStates <- map("state", fill = TRUE,
 ```
 
 ```{r}
-data %>% group_by(Plant.State) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(Plant.State)
-
-leaflet() %>% addTiles() %>% addPolygons(data = AllStates,
-                                         #fillColor = heat.colors(8, alpha = 1),
-                                         color = "black",
-                                         stroke = FALSE)
+# data %>% group_by(Plant.State) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(Plant.State)
+# 
+# leaflet() %>% addTiles() %>% addPolygons(data = AllStates,
+#                                          #fillColor = heat.colors(8, alpha = 1),
+#                                          color = "black",
+#                                          stroke = FALSE)
 ```
 
+* Quantify that technology by state
 
-* What is the largest 
+Google Vis chart that visualizes that amount of power in MW that each state produces with that power technology
+```{r}
+tech_byState <- data %>% filter(Technology == "Nuclear") %>% group_by(Plant.State) %>% summarise(sum_MW = sum(capacity_MW)) %>% as.data.frame()
+#tech_byState <- tech_byState[-1,]
+
+techbystate <- gvisGeoChart(tech_byState[-1,], "Plant.State", "sum_MW",
+                 options=list(region="US", displayMode="regions",
+                              resolution="provinces",
+                              width="auto", height="auto"))
+plot(techbystate)
+```
+
+#### Tab 2 ####
+
+* What is the production of the power by technology in the selected state.
+
+```{r}
+data %>% 
+```
+
 
 * Showing generators of particular type
 
@@ -153,15 +169,20 @@ Bar graph displaying the breakdown of:
 * The company with the most number of generators
 * The companies ranked in the state by power production
 ```{r}
-data %>% filter(Plant.State == "CA") %>% group_by(Technology) %>% tally() %>% arrange(desc(n))
+data %>% 
+  filter(Plant.State == "CA") %>% group_by(Technology) %>% tally() %>% arrange(desc(n)) %>% 
+  ggplot(aes(reorder(Technology, desc(Technology)), y = n)) + t +
+  geom_col() + coord_flip() +
+  labs(x = "Technology", y = "Number of Power Generators")
 
-data %>% filter(Plant.State == "CA") %>% group_by(Technology) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(desc(sum_MW))
+data %>% filter(Plant.State == "CA") %>% group_by(Technology) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(desc(sum_MW)) %>% 
+  ggplot(aes(reorder(Technology, desc(Technology)), y = sum_MW)) + t +
+  geom_col() + coord_flip() +
+  labs(x = "State", y = "Power Production (MW)")
 
-data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% tally() %>% arrange(desc(n))
+data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% tally() %>% filter(n==max(n))
 
-data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(desc(sum_MW))
+data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% summarise(sum_MW = sum(capacity_MW)) %>% filter(sum_MW == max(sum_MW))
 ```
 
 * Number of power generator by company
-
-## Tab 2
