@@ -14,7 +14,7 @@ shinyServer(function(input, output){
   })
   
   state_companyGroup <- reactive({
-    data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name)
+    data %>% filter(Plant.State == input$selected_state) %>% group_by(Entity.Name)
   })
   
   output$plant_map <- renderLeaflet({
@@ -62,7 +62,19 @@ shinyServer(function(input, output){
     labs(x = "Generator Technology", y = "Power Production (MW)"))
   
   #Max Info Boxes for Highest Power Production
+  output$company_maxGenerator <- renderValueBox({
+    valueBox(
+      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(n), 
+      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(Entity.Name), 
+      icon=icon("list"))
+  })
   
+  output$company_maxPower <- renderValueBox({
+    valueBox(
+      state_companyGroup() %>% summarise(sum_MW = sum(capacity_MW)) %>% filter(sum_MW == max(sum_MW)) %>% select(sum_MW), 
+      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(Entity.Name) %>% select(Entity.Name), 
+      icon=icon("list"))
+  })
   
   
   

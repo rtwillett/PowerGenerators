@@ -38,8 +38,12 @@ shinyUI(dashboardPage(
                                 plotOutput("techByState")), 
                             box(title = "Power Production By Technology", 
                                 width=6, 
-                                plotOutput("powerByTechState"))
-                    )), 
+                                plotOutput("powerByTechState")) ), 
+                    fluidRow(
+                                valueBoxOutput("company_maxGenerator"), 
+                                valueBoxOutput("company_maxPower")
+                    )
+                    ), 
             tabItem(tabName = "Types of Power"), 
             tabItem(tabName = "refs", 
                     box(HTML("<div><p>Placeholder</p></d>")))
