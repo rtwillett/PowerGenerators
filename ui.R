@@ -10,9 +10,9 @@ shinyUI(dashboardPage(
             menuItem("Power Generator Summary (National)", tabName = "map", icon = icon("map")),
             menuItem("Power Generator Summary (State)", tabName = "powergen", icon = icon("map")), 
             menuItem("Types of Power", tabName = "powertype", icon = icon("powertype")),
-            menuItem("References", tabName = "refs", icon = icon("refs")),
-            selectInput("selected_tech", "Technology", choices_tech, selected="Nuclear"), 
-            selectInput("selected_state", "State", choices_state, selected = "TX")
+            menuItem("References", tabName = "refs", icon = icon("refs"))#,
+            #selectInput("selected_tech", "Technology", choices_tech, selected="Nuclear")#, 
+            #selectInput("selected_state", "State", choices_state, selected = "TX")
           )
         ), 
         
@@ -25,7 +25,8 @@ shinyUI(dashboardPage(
                             box(title = "Location of Power Generators",
                                 width = 6, 
                                 leafletOutput("plant_map")) ,
-                            box(title = "Total Output of Power by State (MW)", 
+                            box(selectInput("selected_tech", "Technology", choices_tech, selected="Nuclear"), 
+                                title = "Total Output of Power by State (MW)", 
                                 width = 6, htmlOutput("techbystate"))
                     ), 
                     fluidRow(box(title = "Data Table", 
@@ -39,9 +40,13 @@ shinyUI(dashboardPage(
                             box(title = "Power Production By Technology", 
                                 width=6, 
                                 plotOutput("powerByTechState")) ), 
-                    fluidRow(
-                                valueBoxOutput("company_maxGenerator"), 
-                                valueBoxOutput("company_maxPower")
+                        
+                    fluidRow(    
+                                box(column(2, selectInput("selected_state", "Select State", choices_state, selected = "TX")),
+                                    column(5, valueBoxOutput("company_maxGenerator", width = "100%")),
+                                    column(5, valueBoxOutput("company_maxPower", width="100%")),
+                                    width=12
+                                )
                     )
                     ), 
             tabItem(tabName = "Types of Power"), 

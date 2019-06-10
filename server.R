@@ -66,14 +66,16 @@ shinyServer(function(input, output){
     valueBox(
       state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(n), 
       state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(Entity.Name), 
-      icon=icon("list"))
+      icon=icon("list"), 
+      width=12)
   })
   
   output$company_maxPower <- renderValueBox({
     valueBox(
       state_companyGroup() %>% summarise(sum_MW = sum(capacity_MW)) %>% filter(sum_MW == max(sum_MW)) %>% select(sum_MW), 
       state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(Entity.Name) %>% select(Entity.Name), 
-      icon=icon("list"))
+      icon=icon("list"), 
+      width=12)
   })
   
   
