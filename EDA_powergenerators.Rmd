@@ -186,3 +186,13 @@ data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% summarise(sum
 ```
 
 * Number of power generator by company
+```{r}
+data %>% group_by(Technology) %>% 
+```
+
+```{r}
+ggplot(data, aes(x=Technology, y=Operating.Year, col=Technology)) + 
+  geom_jitter() +
+  theme_classic()
+```
+
