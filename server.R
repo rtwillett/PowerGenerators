@@ -64,21 +64,28 @@ shinyServer(function(input, output){
   #Max Info Boxes for Highest Power Production
   output$company_maxGenerator <- renderValueBox({
     valueBox(
-      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(n), 
-      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(Entity.Name), 
+      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% dplyr::select(n), 
+      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% dplyr::select(Entity.Name), 
       icon=icon("list"), 
       width=12)
   })
   
   output$company_maxPower <- renderValueBox({
     valueBox(
-      state_companyGroup() %>% summarise(sum_MW = sum(capacity_MW)) %>% filter(sum_MW == max(sum_MW)) %>% select(sum_MW), 
-      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% select(Entity.Name) %>% select(Entity.Name), 
+      state_companyGroup() %>% summarise(sum_MW = sum(capacity_MW)) %>% filter(sum_MW == max(sum_MW)) %>% dplyr::select(sum_MW), 
+      state_companyGroup() %>% tally() %>% filter(n==max(n)) %>% dplyr::select(Entity.Name) %>% dplyr::select(Entity.Name), 
       icon=icon("list"), 
       width=12)
   })
   
-  
+  output$ageByTech <- renderPlot(
+    ggplot(data, aes(x=reorder(Technology, desc(Technology)), y=Operating.Year, col=Technology)) + 
+      geom_boxplot() +
+      theme_classic() + 
+      labs(y="Year Built", x="Power Generator Technology") +
+      theme(legend.position = "none") +
+      coord_flip()
+    )
   
   
 })

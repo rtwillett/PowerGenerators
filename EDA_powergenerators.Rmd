@@ -16,6 +16,9 @@ library(googleVis)
 
 # Initialization of plot theme
 t <- theme_classic()
+
+# Setting working directory
+setwd("~/NYCDSA/Shiny/PowerGenerators_shiny")
 ```
 
 Loading data
@@ -139,9 +142,6 @@ plot(techbystate)
 
 * What is the production of the power by technology in the selected state.
 
-```{r}
-data %>% 
-```
 
 
 * Showing generators of particular type
@@ -187,12 +187,19 @@ data %>% filter(Plant.State == "CA") %>% group_by(Entity.Name) %>% summarise(sum
 
 * Number of power generator by company
 ```{r}
-data %>% group_by(Technology) %>% 
+data %>% filter(Technology == "Nuclear") %>% group_by(Entity.Name) %>% summarise(sum_MW = sum(capacity_MW)) %>% arrange(desc(sum_MW)) %>% slice(0:20) %>% 
+  ggplot(aes(x=Entity.Name, y=sum_MW)) + 
+  geom_col() + 
+  theme_classic() +
+  coord_flip()
 ```
 
 ```{r}
-ggplot(data, aes(x=Technology, y=Operating.Year, col=Technology)) + 
-  geom_jitter() +
-  theme_classic()
+ggplot(data, aes(x=reorder(Technology, desc(Technology)), y=Operating.Year, col=Technology)) + 
+  geom_boxplot() +
+  theme_classic() + 
+  labs(y="Year Built", x="Power Generator Technology") +
+  theme(legend.position = "none") +
+  coord_flip()
 ```
 

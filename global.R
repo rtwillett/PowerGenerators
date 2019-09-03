@@ -11,7 +11,7 @@ data <- data %>% rename(
   capacity_MW = Nameplate.Capacity..MW.,
   capacity_MW_summer = Net.Summer.Capacity..MW.,
   capacity_MW_winter = Net.Winter.Capacity..MW.) %>% 
-  select(-Google.Map,-Bing.Map) %>% 
+  dplyr::select(-Google.Map,-Bing.Map) %>% 
   mutate(capacity_MW = gsub(",","", capacity_MW), 
          capacity_MW_summer = gsub(",","", capacity_MW_summer),
          capacity_MW_winter = gsub(",","", capacity_MW_winter))

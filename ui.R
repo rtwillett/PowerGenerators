@@ -1,4 +1,4 @@
-shinyUI(dashboardPage(
+    shinyUI(dashboardPage(
         dashboardHeader(title = "Analysis of Power Generators in the USA", 
                         titleWidth = 500), 
         
@@ -8,11 +8,9 @@ shinyUI(dashboardPage(
           sidebarMenu(
             menuItem("Introduction", tabName = "intro", icon = icon("intro")),
             menuItem("Power Generator Summary (National)", tabName = "map", icon = icon("map")),
-            menuItem("Power Generator Summary (State)", tabName = "powergen", icon = icon("map"))#, 
-            # menuItem("Types of Power", tabName = "powertype", icon = icon("powertype")),
-            # menuItem("References", tabName = "refs", icon = icon("refs"))#,
-            #selectInput("selected_tech", "Technology", choices_tech, selected="Nuclear")#, 
-            #selectInput("selected_state", "State", choices_state, selected = "TX")
+            menuItem("Power Generator Summary (State)", tabName = "powergen", icon = icon("map")),
+            menuItem("Age of Generators by Technology", tabName = "techAge", icon = icon("building"))
+            # menuItem("References", tabName = "refs", icon = icon("refs"))
           )
         ), 
         
@@ -35,9 +33,8 @@ shinyUI(dashboardPage(
                              <p>This app facilitates browsing and parsing of power generation technologies and megawatt outputs geographically throughout 
                              the US.</p>
                              
-                             <iframe width='560' height='315' src='https://www.youtube.com/embed/nbPmsBmo03Y' frameborder='0'' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe>
-                             
-                             <p><b>Note:</b></p> This is an additional project that I assigned myself and I have not yet implemented all final features."), 
+                             <iframe width='560' height='315' src='https://www.youtube.com/embed/nbPmsBmo03Y' frameborder='0'' allow='accelerometer; autoplay; 
+                             encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe>"), 
                         width=12)), 
             tabItem(tabName = "map",
                     fluidRow(
@@ -71,10 +68,10 @@ shinyUI(dashboardPage(
                                     width=12
                                 )
                     )
-                    )#, 
-            #tabItem(tabName = "Types of Power"), 
-            # tabItem(tabName = "refs", 
-            #         box(HTML("<div><p>Placeholder</p></d>")))
+                    ), 
+            tabItem(tabName = "techAge",
+                    HTML('<h2>Construction Year of Generator by Technology</h2>'),
+                    plotOutput("ageByTech"))
           )
         )
 
